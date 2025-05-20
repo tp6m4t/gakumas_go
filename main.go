@@ -1,151 +1,90 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strings"
-
-	textinput "github.com/charmbracelet/bubbles/textinput"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/spf13/cobra"
 )
 
-var mode string
-
-// 定義選單節點
-var menu = map[string][]string{
-	"0": {"家"},
-	"1": {"劇情", "a.主線", "b.個人", "c.支援卡", "d.活動"},
-	"2": {"偶像", "a.角色卡", "b.回憶卡", "c.支援卡", "d.編成"},
-	"3": {"競賽", "a.競技場", "b.偶像之路"},
-	"4": {"抽卡", "a.常駐", "a.1.支援卡", "a.1.角色卡", "b.活動a", "b.1.支援卡", "b.1.角色卡"},
+type Page struct {
+	Name        string
+	Description string
+	Options     map[string]*Page // 子頁面或同級頁面轉跳
+	Parent      *Page            // 指向父頁面（可退回用）
+	BackOption  string           // 退回選項名稱 (例如 "b" 退回)
 }
 
-// 分頁顯示的最大項目數
-const pageSize = 4
-
-// TUI model
-type model struct {
-	pos      string
-	quitting bool
-	msg      string
-	input    textinput.Model
-	page     int
-}
-
-func initialModel() model {
-	ti := textinput.New()
-	ti.Placeholder = "輸入選項後按 Enter"
-	ti.Focus()
-	return model{pos: "0", input: ti, page: 0}
-}
-
-func (m model) Init() tea.Cmd {
-	return textinput.Blink
-}
-
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var cmd tea.Cmd
-	m.input, cmd = m.input.Update(msg)
-
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		if msg.Type == tea.KeyEnter {
-			input := strings.ToLower(strings.TrimSpace(m.input.Value()))
-			switch input {
-			case "ctrl+c", "q", "..", "exit":
-				if m.pos != "0" {
-					m.pos = "0"
-					m.page = 0
-					m.msg = "返回主選單"
-				} else {
-					m.quitting = true
-					return m, tea.Quit
-				}
-			case "next":
-				maxPage := (len(menu[m.pos]) - 2) / pageSize
-				if m.page < maxPage {
-					m.page++
-				}
-			case "prev":
-				if m.page > 0 {
-					m.page--
-				}
-			case "0", "1", "2", "3", "4":
-				m.pos = input
-				m.page = 0
-				m.msg = ""
-			case "a", "b", "c", "d", "a.1", "b.1":
-				m.msg = fmt.Sprintf("選擇了子選項 [%s]", input)
-			default:
-				m.msg = fmt.Sprintf("未知指令：%s", input)
-			}
-			m.input.SetValue("") // 清除輸入框
-		}
+func (p *Page) Show() {
+	fmt.Println("=== " + p.Name + " ===")
+	fmt.Println(p.Description)
+	fmt.Println("選項：")
+	for k := range p.Options {
+		fmt.Println(" -", k)
 	}
-	return m, cmd
-}
-
-func (m model) View() string {
-	if m.quitting {
-		return "再見！\n"
+	if p.Parent != nil {
+		fmt.Printf("輸入 '%s' 退回上一頁\n", p.BackOption)
 	}
-
-	output := fmt.Sprintf("當前位置：[%s] %s\n", m.pos, menu[m.pos][0])
-	output += fmt.Sprintf("\n選單 (第 %d 頁)：\n", m.page+1)
-	items := menu[m.pos][1:]
-	start := m.page * pageSize
-	end := start + pageSize
-	if end > len(items) {
-		end = len(items)
-	}
-	for _, item := range items[start:end] {
-		output += fmt.Sprintf("[%s]\n", item)
-	}
-	if len(items) > pageSize {
-		output += "\n[prev] 上一頁	[next] 下一頁\n"
-	}
-	output += "\n數字轉跳主選單、字母選子選項，q/.. 離開\n"
-	output += m.input.View() + "\n"
-	if m.msg != "" {
-		output += "\n→ " + m.msg + "\n"
-	}
-	return output
-}
-
-func runTUI() {
-	p := tea.NewProgram(initialModel())
-	if err := p.Start(); err != nil {
-		fmt.Println("錯誤：", err)
-		os.Exit(1)
-	}
-}
-
-func runSimulate() {
-	fmt.Println("模擬模式啟動：自動訓練中...")
-	fmt.Println(`{"day": 1, "action": "dance", "result": {"dance": +3}}`)
+	fmt.Print("請輸入選項: ")
 }
 
 func main() {
-	rootCmd := &cobra.Command{
-		Use:   "idol",
-		Short: "偶像育成 CLI 工具",
-		Run: func(cmd *cobra.Command, args []string) {
-			switch mode {
-			case "tui":
-				runTUI()
-			case "simulate":
-				runSimulate()
-			default:
-				fmt.Println("請指定模式: --mode [tui|simulate]")
-				os.Exit(1)
-			}
-		},
+	// 建立頁面
+	root := &Page{
+		Name:        "主頁面",
+		Description: "這是主頁面",
+		Options:     make(map[string]*Page),
+		Parent:      nil,
 	}
 
-	rootCmd.Flags().StringVar(&mode, "mode", "", "執行模式: tui / simulate")
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	sub1 := &Page{
+		Name:        "子頁面1",
+		Description: "這是子頁面1",
+		Options:     make(map[string]*Page),
+		Parent:      root,
+		BackOption:  "b",
+	}
+
+	sub2 := &Page{
+		Name:        "子頁面2",
+		Description: "這是子頁面2",
+		Options:     make(map[string]*Page),
+		Parent:      root,
+		BackOption:  "b",
+	}
+
+	// 同級頁面互相轉跳
+	sub1.Options["goto2"] = sub2
+	sub2.Options["goto1"] = sub1
+
+	// 主頁面指向子頁面
+	root.Options["1"] = sub1
+	root.Options["2"] = sub2
+
+	currentPage := root
+
+	scanner := bufio.NewScanner(os.Stdin)
+
+	for {
+		currentPage.Show()
+
+		if !scanner.Scan() {
+			break
+		}
+		input := strings.TrimSpace(scanner.Text())
+
+		// 退回上一頁
+		if input == currentPage.BackOption && currentPage.Parent != nil {
+			currentPage = currentPage.Parent
+			continue
+		}
+
+		// 跳轉選項
+		nextPage, ok := currentPage.Options[input]
+		if ok {
+			currentPage = nextPage
+		} else {
+			fmt.Println("無效選項，請重新輸入。")
+		}
 	}
 }
