@@ -1,4 +1,4 @@
-package Buff
+package core
 
 type Buff int
 
