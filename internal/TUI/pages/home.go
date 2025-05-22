@@ -3,7 +3,7 @@ package pages
 import (
 	"fmt"
 
-	"LocalProject/models"
+	"LocalProject/internal/TUI/models"
 
 	tea "github.com/charmbracelet/bubbletea"
 )

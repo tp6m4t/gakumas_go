@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"LocalProject/pages"
+	"LocalProject/internal/TUI/pages"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
