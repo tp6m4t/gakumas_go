@@ -2,6 +2,7 @@ package main
 
 import (
 	field "LocalProject/pkg/CardGame/Field"
+	skillCard "LocalProject/pkg/core/Card/SkillCard"
 	"fmt"
 )
 
@@ -10,6 +11,10 @@ func main() {
 	var f field.Field
 	//f.State.Turns = {field.Turn{}}
 	f.ExtraTurn = 10
+	f.Cars.Hand = append(f.Cars.Hand, skillCard.AppealBasics)
+	f.Health = 0
+	f.Energy = 11
+	f.MaxHealth = 5
 	for !f.IsEnd() {
 		//顯示當前狀態
 		fmt.Println(f.String())
@@ -22,13 +27,15 @@ func main() {
 }
 
 func UserAction(f *field.Field) bool {
-	tips := "\n使用卡片: c\n使用飲料: d\n退出: e\n\n請輸入指令:"
-	in := UserInput("\033[H\033[2J"+f.String()+"\n"+tips, []string{"c", "d", "e"})
+	tips := "\n使用卡片: c\n使用飲料: d\n回復體力: s\n退出: e\n\n請輸入指令:"
+	in := UserInput("\033[H\033[2J"+f.String()+"\n"+tips, []string{"c", "d", "e", "s"})
 	switch in {
 	case "c":
 		UseCard(f)
 	case "d":
 		UseDrink(f)
+	case "s":
+		f.SkipTurn()
 	case "e":
 		return false
 	}
