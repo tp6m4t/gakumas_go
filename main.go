@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"LocalProject/pages"
+
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/taipi/kakumasu_CLI/pages"
 )
 
 func main() {

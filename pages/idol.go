@@ -3,8 +3,9 @@ package pages
 import (
 	"fmt"
 
+	"LocalProject/models"
+
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/taipi/kakumasu_CLI/models"
 )
 
 type idolModel struct {

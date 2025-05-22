@@ -1,4 +1,4 @@
-module github.com/taipi/kakumasu_CLI
+module LocalProject
 
 go 1.24.1
 
