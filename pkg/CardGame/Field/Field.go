@@ -66,3 +66,20 @@ func (f Field) String() string {
 func (f *Field) IsEnd() bool {
 	return f.State.Turn == len(f.State.Turns) && f.State.ExtraTurn == 0
 }
+
+func NewField(Deck deck.Deck, Score int, Health int, MaxHealth int, Energy int, ExtraTurn int, turn int, Drinks []int, Buffs []core.Buff, Items []int, Turns []Turn) *Field {
+	f := &Field{}
+	f.Cars.Deck.Push(Deck...) //牌堆
+	f.Score = 0               //當前分數
+	f.Health = Health         //當前體力
+	f.MaxHealth = MaxHealth   //最大體力
+	f.Energy = Energy         //當前能量
+	f.ExtraTurn = ExtraTurn   //額外回合
+	f.Turn = turn             //當前回合
+	f.Drinks = []int{}        //可用飲料
+	f.Buffs = []core.Buff{}   //當前Buff DeBuff
+	f.Items = []int{}         //當前道具
+	f.Turns = []Turn{}        //本局回	合資訊
+	f.DrawCards(3)
+	return f
+}

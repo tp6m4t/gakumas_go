@@ -8,11 +8,11 @@ import (
 
 func main() {
 	fmt.Println("Card Game Main")
-	var f field.Field
-	//f.State.Turns = {field.Turn{}}
+	f := field.Field{}
+	f.State.Turns = []field.Turn{}
 	f.ExtraTurn = 10
 	for idx := range [...]int{1, 2, 3, 1} {
-		f.Cars.Hand.Push(skillCard.NewSkillCard(idx))
+		f.Cars.Deck.Push(skillCard.NewSkillCard(idx))
 	}
 	f.Health = 0
 	f.Energy = 11
