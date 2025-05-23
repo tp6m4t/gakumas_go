@@ -11,7 +11,9 @@ func main() {
 	var f field.Field
 	//f.State.Turns = {field.Turn{}}
 	f.ExtraTurn = 10
-	f.Cars.Hand = append(f.Cars.Hand, skillCard.AppealBasics)
+	for idx := range [...]int{1, 2, 3, 1} {
+		f.Cars.Hand.Push(skillCard.NewSkillCard(idx))
+	}
 	f.Health = 0
 	f.Energy = 11
 	f.MaxHealth = 5
