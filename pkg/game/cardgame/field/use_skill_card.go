@@ -1,12 +1,12 @@
 package field
 
 import (
-	"LocalProject/pkg/core/Card/SkillCard"
+	"LocalProject/pkg/game/data/card/skillcard"
 	"fmt"
 )
 
 // 檢查是否符合出牌條件
-func (f *Field) isCardUsable(c SkillCard.SkillCard) bool {
+func (f *Field) isCardUsable(c skillcard.SkillCard) bool {
 	return c.IsUsable(f)
 }
 

@@ -1,19 +1,19 @@
 package main
 
 import (
-	field "LocalProject/pkg/CardGame/Field"
-	skillCard "LocalProject/pkg/core/Card/SkillCard"
+	field "LocalProject/pkg/game/card_game/field"
+	skillCard "LocalProject/pkg/game/data/card/skillcard"
 	"fmt"
 )
 
 func main() {
 	fmt.Println("Card Game Main")
 	f := field.Field{}
-	f.State.Turns = []field.Turn{}
 	f.ExtraTurn = 10
 	for idx := range [...]int{1, 2, 3, 1} {
 		f.Cars.Deck.Push(skillCard.NewSkillCard(idx))
 	}
+	f.DrawCards(3)
 	f.Health = 0
 	f.Energy = 11
 	f.MaxHealth = 5

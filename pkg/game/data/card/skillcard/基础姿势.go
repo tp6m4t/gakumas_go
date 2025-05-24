@@ -1,4 +1,4 @@
-package SkillCard
+package skillcard
 
 type poseBasics struct {
 	SkillCardBase

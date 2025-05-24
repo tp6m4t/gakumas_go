@@ -1,14 +1,14 @@
 package deck
 
 import (
-	"LocalProject/pkg/core/Card/SkillCard"
+	"LocalProject/pkg/game/data/card/skillcard"
 	"fmt"
 	"math/rand"
 	"time"
 )
 
 // 牌堆不保證其中的順序
-type Deck []SkillCard.SkillCard
+type Deck []skillcard.SkillCard
 
 // 移除特定牌
 func (d *Deck) Remove(index int) {
@@ -34,7 +34,7 @@ func (d *Deck) DrawCards(n int) (Deck, error) {
 }
 
 // 放入牌堆
-func (d *Deck) Push(cards ...SkillCard.SkillCard) {
+func (d *Deck) Push(cards ...skillcard.SkillCard) {
 	*d = append(*d, cards...)
 }
 

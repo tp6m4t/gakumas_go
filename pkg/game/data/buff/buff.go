@@ -1,13 +1,13 @@
-package core
+package buff
 
 type Buff interface {
 	IsDebuff() bool
 }
 
 type BaseBuff struct {
-	ID           int
-	Name         string
-	DESCRIPTIONS string
+	id           int
+	name         string
+	descriptions string
 }
 
 func (BaseBuff) IsDebuff() bool {

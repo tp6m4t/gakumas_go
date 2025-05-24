@@ -14,10 +14,10 @@ func (f *Field) NextTrue() {
 	f.Cars.Hand.Clear()
 
 	//更新回合資訊
-	if f.State.Turn == len(f.State.Turns) {
+	if f.State.CurrentTurn == len(f.State.Turns) {
 		f.State.ExtraTurn--
 	} else {
-		f.State.Turn++
+		f.State.CurrentTurn++
 	}
 
 	f.DrawCards(3)

@@ -1,15 +1,11 @@
 package field
 
 import (
-	"LocalProject/pkg/CardGame/Field/deck"
-	"LocalProject/pkg/CardGame/core"
+	"LocalProject/pkg/game/cardgame/field/deck"
+	"LocalProject/pkg/game/cardgame/field/turn"
+	"LocalProject/pkg/game/data/buff"
 	"fmt"
 )
-
-type Turn struct {
-	Color *int
-	Skill []core.Skill
-}
 
 type CarDeck struct {
 	Deck         deck.Deck //山扎
@@ -20,17 +16,17 @@ type CarDeck struct {
 
 // 場地資訊相關變數
 type State struct {
-	Cars      CarDeck     //牌堆
-	Score     int         //得分
-	Health    int         //當前體力
-	MaxHealth int         //最大體力
-	Energy    int         //當前能量
-	Drinks    []int       //可用飲料
-	Buffs     []core.Buff //當前Buff DeBuff
-	Items     []int       //當前道具
-	Turns     []Turn      //本局回	合資訊
-	ExtraTurn int         //額外回合
-	Turn      int         //當前回合
+	Cars        CarDeck     //牌堆
+	Score       int         //得分
+	Health      int         //當前體力
+	MaxHealth   int         //最大體力
+	Energy      int         //當前能量
+	Drinks      []int       //可用飲料
+	Buffs       []buff.Buff //當前Buff DeBuff
+	Items       []int       //當前道具
+	Turns       []turn.Turn //本局回	合資訊
+	ExtraTurn   int         //額外回合
+	CurrentTurn int         //當前回合
 }
 
 // 行為計算相關變數
@@ -45,7 +41,7 @@ func (f Field) String() string {
 		str += fmt.Sprintf("能量:%d   ", f.Energy)
 	}
 	str += fmt.Sprintf("體力:%d/%d\n", f.Health, f.MaxHealth)
-	str += fmt.Sprintf("回和數:%d/%d+%d\n", len(f.Turns), f.Turn, f.ExtraTurn)
+	str += fmt.Sprintf("回和數:%d/%d+%d\n", len(f.Turns), f.CurrentTurn, f.ExtraTurn)
 	//當前buff
 	//當前道具
 	str += "可用卡牌:"
@@ -64,10 +60,10 @@ func (f Field) String() string {
 
 // 所有回和/額外回合結束?
 func (f *Field) IsEnd() bool {
-	return f.State.Turn == len(f.State.Turns) && f.State.ExtraTurn == 0
+	return f.State.CurrentTurn == len(f.State.Turns) && f.State.ExtraTurn == 0
 }
 
-func NewField(Deck deck.Deck, Score int, Health int, MaxHealth int, Energy int, ExtraTurn int, turn int, Drinks []int, Buffs []core.Buff, Items []int, Turns []Turn) *Field {
+func NewField(Deck deck.Deck, Score int, Health int, MaxHealth int, Energy int, ExtraTurn int, Turn int, Drinks []int, Buffs []buff.Buff, Items []int, Turns []turn.Turn) *Field {
 	f := &Field{}
 	f.Cars.Deck.Push(Deck...) //牌堆
 	f.Score = 0               //當前分數
@@ -75,11 +71,11 @@ func NewField(Deck deck.Deck, Score int, Health int, MaxHealth int, Energy int, 
 	f.MaxHealth = MaxHealth   //最大體力
 	f.Energy = Energy         //當前能量
 	f.ExtraTurn = ExtraTurn   //額外回合
-	f.Turn = turn             //當前回合
+	f.CurrentTurn = Turn      //當前回合
 	f.Drinks = []int{}        //可用飲料
-	f.Buffs = []core.Buff{}   //當前Buff DeBuff
+	f.Buffs = []buff.Buff{}   //當前Buff DeBuff
 	f.Items = []int{}         //當前道具
-	f.Turns = []Turn{}        //本局回	合資訊
+	f.Turns = []turn.Turn{}   //本局回	合資訊
 	f.DrawCards(3)
 	return f
 }
