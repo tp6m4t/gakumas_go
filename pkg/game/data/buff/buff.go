@@ -1,24 +1,104 @@
 package buff
 
-type Buff interface {
-	IsDebuff() bool
+import "fmt"
+
+type field interface {
+	AddScore(value int)
+	SubEnergy(value int)
+	SubHealth(value int)
+	AddEnergy(value int)
+	AddHealth(value int)
+	Subscribe(event string, f func(interface{}))
 }
 
+//Buff interface
+type Buff interface {
+	GetCount() int
+	AddCount(count int)
+	GetID() int
+	GetName() string
+	Subscribe(f field)
+}
+
+//BaseBuff
 type BaseBuff struct {
 	id           int
 	name         string
 	descriptions string
+	count        int
 }
+
+func (b *BaseBuff) GetID() int {
+	return b.id
+}
+
+func (b *BaseBuff) GetName() string {
+	return b.name
+}
+func (b *BaseBuff) GetCount() int {
+	return b.count
+}
+func (b *BaseBuff) GetDescription() string {
+	return b.descriptions
+}
+func (b *BaseBuff) Subscribe(f field) {}
 
 func (BaseBuff) IsDebuff() bool {
 	return false
 }
 
+//Debuff
 type DeBuff struct {
 }
 
 func (DeBuff) IsDebuff() bool {
-	return false
+	return true
+}
+
+//buffBuid
+var buffBuild = make(map[int]func(value int) Buff)
+var buffMap = make(map[string]int)
+
+func init() {
+	fmt.Println("Buff init")
+	BuffBuildAdd(func(value int) Buff { return NewGoodImpression(value) })
+}
+
+func BuffBuildAdd(BuildFunc func(value int) Buff) {
+	Card := BuildFunc(0)
+	_, ok := buffBuild[Card.GetID()]
+	if ok {
+		fmt.Printf("%s,%s技能牌ID:%d重複\n", Card.GetName(), buffBuild[Card.GetID()](0).GetName(), Card.GetID())
+	} else {
+		buffMap[Card.GetName()] = Card.GetID()
+		buffBuild[Card.GetID()] = BuildFunc
+	}
+}
+
+func NewBuffByID(id int, value int) Buff {
+	_, ok := buffBuild[id]
+	if !ok {
+		fmt.Printf("buff ID:%d不存在\n", id)
+		return nil
+	}
+	return buffBuild[id](value)
+}
+func NewBuffByName(name string, value int) Buff {
+	id, ok := buffMap[name]
+	if !ok {
+		fmt.Printf("buff詞條:%s 不存在\n", name)
+		return nil
+	}
+	return NewBuffByID(id, value)
+}
+
+func GetBuffID(name string) int {
+	id, ok := buffMap[name]
+	if !ok {
+		fmt.Printf("buff詞條:%s 不存在\n", name)
+		return -1
+	}
+	return id
 }
 
 /*

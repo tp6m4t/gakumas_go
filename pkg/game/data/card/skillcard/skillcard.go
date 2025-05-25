@@ -8,6 +8,7 @@ type field interface {
 	SubHealth(value int)
 	AddEnergy(value int)
 	AddHealth(value int)
+	AddBuff(name string, value int)
 }
 
 // 只記錄圖鑑需顯示的牌面資料
@@ -123,6 +124,7 @@ type SkillCard interface {
 }
 
 var skillCardBuild = make(map[int]func() SkillCard)
+var skillCardMap = make(map[string]int)
 
 func init() {
 	fmt.Println("SkillCard init")
@@ -130,6 +132,7 @@ func init() {
 	SkillCardBuildAdd(func() SkillCard { return NewExpressionBasics() })
 	SkillCardBuildAdd(func() SkillCard { return NewPoseBasics() })
 	SkillCardBuildAdd(func() SkillCard { return NewTrouble() })
+	SkillCardBuildAdd(func() SkillCard { return NewCuteGestures() })
 }
 
 func SkillCardBuildAdd(BuildFunc func() SkillCard) {
@@ -138,14 +141,24 @@ func SkillCardBuildAdd(BuildFunc func() SkillCard) {
 	if ok {
 		fmt.Printf("%s,%s技能牌ID:%d重複\n", Card.GetName(), skillCardBuild[Card.GetID()]().GetName(), Card.GetID())
 	} else {
+		skillCardMap[Card.GetName()] = Card.GetID()
 		skillCardBuild[Card.GetID()] = BuildFunc
 	}
 }
 
-func NewSkillCard(id int) SkillCard {
+func NewSkillCardByID(id int) SkillCard {
 	_, ok := skillCardBuild[id]
 	if !ok {
 		fmt.Printf("技能牌ID:%d不存在\n", id)
+		return nil
 	}
 	return skillCardBuild[id]()
+}
+func NewSkillCardByName(name string) SkillCard {
+	id, ok := skillCardMap[name]
+	if !ok {
+		fmt.Printf("技能牌名稱:%s 不存在\n", name)
+		return nil
+	}
+	return NewSkillCardByID(id)
 }

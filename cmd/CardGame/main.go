@@ -1,26 +1,25 @@
 package main
 
 import (
-	field "LocalProject/pkg/game/card_game/field"
+	field "LocalProject/pkg/game/cardgame/field"
+	"LocalProject/pkg/game/cardgame/field/deck"
 	skillCard "LocalProject/pkg/game/data/card/skillcard"
 	"fmt"
 )
 
 func main() {
 	fmt.Println("Card Game Main")
-	f := field.Field{}
-	f.ExtraTurn = 10
-	for idx := range [...]int{1, 2, 3, 1} {
-		f.Cars.Deck.Push(skillCard.NewSkillCard(idx))
+	var myDeck deck.Deck
+	myDeck = []skillCard.SkillCard{}
+	for _, idx := range [...]int{4} {
+		myDeck.Push(skillCard.NewSkillCardByID(idx))
 	}
-	f.DrawCards(3)
-	f.Health = 0
-	f.Energy = 11
-	f.MaxHealth = 5
+
+	f := field.NewField(myDeck, 0, 5, 10, make([]int, 0), make([]int, 0), nil)
 	for !f.IsEnd() {
 		//顯示當前狀態
 		fmt.Println(f.String())
-		nextTrun := UserAction(&f)
+		nextTrun := UserAction(f)
 		if !nextTrun {
 			break
 		}
